@@ -9,6 +9,8 @@ const VSCALE = 0.5
 const SHOOT_INTERVAL = 0.3
 
 var speed = Vector2()
+var dir = Vector2()
+var flap_phase = 0
 var current_anim = ""
 var current_mirror = false
 
@@ -25,22 +27,16 @@ var shoot_countdown = 0
 #		get_parent().add_child(bullet)
 #		shoot_countdown = SHOOT_INTERVAL
 
+func _handle_collision_if_necessary():
+	pass
+
+
 
 func _fixed_process(delta):
 	shoot_countdown -= delta
-	var dir = Vector2()
-	if (Input.is_action_pressed("up")):
-		dir += Vector2(0, -1)
-	if (Input.is_action_pressed("down")):
-		dir += Vector2(0, 1)
-	if (Input.is_action_pressed("left")):
-		dir += Vector2(-1, 0)
-	if (Input.is_action_pressed("right")):
-		dir += Vector2(1, 0)
+	dir = _get_input_direction()
+
 	
-	if (dir != Vector2()):
-		dir = dir.normalized()
-	speed = speed.linear_interpolate(dir*MAX_SPEED, delta*ACCEL)
 	var motion = speed*delta
 	motion.y *= VSCALE
 	motion = x(motion)
@@ -94,6 +90,28 @@ func _fixed_process(delta):
 #		current_anim = next_anim
 #		current_mirror = next_mirror
 
+func _get_speed(dir):
+	speed = speed.linear_interpolate(dir*MAX_SPEED, delta*ACCEL)
+	return speed
+
+func _get_input_direction():
+	var dir = Vector2()
+	if (Input.is_action_pressed("up")):
+		dir += Vector2(0, -1)
+	if (Input.is_action_pressed("down")):
+		dir += Vector2(0, 1)
+	if (Input.is_action_pressed("left")):
+		dir += Vector2(-1, 0)
+	if (Input.is_action_pressed("right")):
+		dir += Vector2(1, 0)
+	
+	if (dir != Vector2()):
+		dir = dir.normalized()
+	return dir
+
+
+
+
 func _get_quantized_angle(angle):
 	var angle_inc = PI/8
 	var angle_lower_bound = -angle_inc
@@ -111,6 +129,7 @@ func _ready():
 
 func _set_sprite_frame(n):
 	_get_sprite().set_frame(n)
+
 func _get_sprite():
 	return get_node("sprite")
 	
