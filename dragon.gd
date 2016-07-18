@@ -31,14 +31,27 @@ var shoot_countdown = 0
 
 
 func _fixed_process(delta):
-	shoot_countdown -= delta
+	_update_direction_and_speed(delta)
+	_move_and_slide_if_necessary(delta)
+	_determine_and_set_sprite_frame()
+	
+func _update_direction_and_speed(delta):
 	dir = _get_input_direction()
 	speed = _get_new_speed(delta)
-	_move_and_slide_if_necessary(delta)
-	
 	_set_direction_label()
 	_set_speed_label()
+	
+func _move_and_slide_if_necessary(delta):
+	var motion = speed*delta
+	motion.y *= VSCALE
+	motion = move(motion)
+	
+	if (is_colliding()):
+		var n = get_collision_normal()
+		motion = n.slide(motion)
+		move(motion)
 
+func _determine_and_set_sprite_frame():
 	if (speed.length() > IDLE_SPEED*0.1):
 		# angle from (0, 1), which is , clockwise positive, between -pi and pi
 		var angle = speed.angle()
@@ -59,17 +72,6 @@ func _fixed_process(delta):
 		
 		var frame = inc_to_frame_map[quantized_angle]
 		_set_sprite_frame(frame)
-		
-
-func _move_and_slide_if_necessary(delta):
-	var motion = speed*delta
-	motion.y *= VSCALE
-	motion = move(motion)
-	
-	if (is_colliding()):
-		var n = get_collision_normal()
-		motion = n.slide(motion)
-		move(motion)
 		
 func _get_new_speed(delta):
 	var new_speed
