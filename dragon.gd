@@ -11,35 +11,34 @@ const SHOOT_INTERVAL = 0.3
 var speed = Vector2()
 var dir = Vector2()
 var flap_phase = 0
-var current_anim = ""
-var current_mirror = false
-
-var shoot_countdown = 0
-
-
-#func _input(event):
-#	if (event.type == InputEvent.MOUSE_BUTTON and event.button_index == 1 and event.pressed and shoot_countdown <= 0):
-#		var pos = get_canvas_transform().affine_inverse()*event.pos
-#		var dir = (pos - get_global_pos()).normalized()
-#		var bullet = preload("res://shoot.tscn").instance()
-#		bullet.advance_dir = dir
-#		bullet.set_pos(get_global_pos() + dir*60)
-#		get_parent().add_child(bullet)
-#		shoot_countdown = SHOOT_INTERVAL
-
-
-
+var flap_period = .08
+var flap_accumulator = 0.0
+var quantized_direction = 0
 
 func _fixed_process(delta):
 	_update_direction_and_speed(delta)
+	_update_flap_phase(delta)
 	_move_and_slide_if_necessary(delta)
 	_determine_and_set_sprite_frame()
 	
 func _update_direction_and_speed(delta):
 	dir = _get_input_direction()
 	speed = _get_new_speed(delta)
+	if (speed.length() > IDLE_SPEED*0.1):
+		# angle from (0, 1), which is , clockwise positive, between -pi and pi
+		var angle = speed.angle()
+		quantized_direction = _get_quantized_angle(angle)
 	_set_direction_label()
 	_set_speed_label()
+	_set_quantized_direction_label(quantized_direction)
+	
+func _update_flap_phase(delta):
+	flap_accumulator += delta
+	if flap_accumulator > flap_period:
+		flap_accumulator  = flap_accumulator - flap_period
+		flap_phase += 1
+		var hframes = _get_sprite().get_hframes()
+		flap_phase = flap_phase % hframes
 	
 func _move_and_slide_if_necessary(delta):
 	var motion = speed*delta
@@ -52,26 +51,9 @@ func _move_and_slide_if_necessary(delta):
 		move(motion)
 
 func _determine_and_set_sprite_frame():
-	if (speed.length() > IDLE_SPEED*0.1):
-		# angle from (0, 1), which is , clockwise positive, between -pi and pi
-		var angle = speed.angle()
-		var quantized_angle = _get_quantized_angle(angle)
-		
-		_set_quantized_direction_label(quantized_angle)
-		
-		var inc_to_frame_map = {
-								0: 60, #N
-								1: 50, #NW
-								2: 40, #W
-								3: 30, #SW
-								4: 20, #S
-								5: 10, #SE
-								6: 0, #E
-								7: 70, #NE
-		}
-		
-		var frame = inc_to_frame_map[quantized_angle]
-		_set_sprite_frame(frame)
+	var key_frame = _get_sprite_key_frame(quantized_direction)
+	var frame = key_frame + flap_phase
+	_set_sprite_frame(frame)
 		
 func _get_new_speed(delta):
 	var new_speed
@@ -112,6 +94,22 @@ func _get_quantized_angle(angle):
 		else:
 			angle_lower_bound += angle_inc
 			angle_upper_bound += angle_inc
+			
+func _get_sprite_key_frame(quantized_angle):
+	var inc_to_frame_map = {
+								0: 60, #N
+								1: 50, #NW
+								2: 40, #W
+								3: 30, #SW
+								4: 20, #S
+								5: 10, #SE
+								6: 0, #E
+								7: 70, #NE
+		}
+		
+	var frame = inc_to_frame_map[quantized_angle]
+	return frame
+	
 	
 
 func _ready():
