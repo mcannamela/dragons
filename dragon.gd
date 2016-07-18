@@ -10,6 +10,9 @@ const SHOOT_INTERVAL = 0.3
 
 var speed = Vector2()
 var dir = Vector2()
+
+var breath_direction = Vector2()
+
 var flap_phase = 0
 var flap_period = .08
 var flap_accumulator = 0.0
@@ -18,8 +21,10 @@ var quantized_direction = 0
 func _fixed_process(delta):
 	_update_direction_and_speed(delta)
 	_update_flap_phase(delta)
+	_update_breath_direction()
 	_move_and_slide_if_necessary(delta)
 	_determine_and_set_sprite_frame()
+	_update_breath()
 	
 func _update_direction_and_speed(delta):
 	dir = _get_input_direction()
@@ -39,6 +44,9 @@ func _update_flap_phase(delta):
 		flap_phase += 1
 		var hframes = _get_sprite().get_hframes()
 		flap_phase = flap_phase % hframes
+		
+func _update_breath_direction():
+	breath_direction = _get_breath_input_direction()
 	
 func _move_and_slide_if_necessary(delta):
 	var motion = speed*delta
@@ -54,6 +62,19 @@ func _determine_and_set_sprite_frame():
 	var key_frame = _get_sprite_key_frame(quantized_direction)
 	var frame = key_frame + flap_phase
 	_set_sprite_frame(frame)
+	
+func _update_breath():
+	var b = _get_breath()
+	var d = breath_direction
+	if _is_breathing():
+		b.set_emitting(true)
+		b.set_pos(32*d)
+		b.set_rot(d.angle())
+	else:
+		b.set_emitting(false)
+		
+func _is_breathing():
+	return breath_direction != Vector2()
 		
 func _get_new_speed(delta):
 	var new_speed
@@ -69,6 +90,21 @@ func _get_input_direction():
 	if (Input.is_action_pressed("move_left")):
 		input_direction += Vector2(-1, 0)
 	if (Input.is_action_pressed("move_right")):
+		input_direction += Vector2(1, 0)
+	
+	if (input_direction != Vector2()):
+		input_direction = input_direction.normalized()
+	return input_direction
+	
+func _get_breath_input_direction():
+	var input_direction = Vector2()
+	if (Input.is_action_pressed("breathe_up")):
+		input_direction += Vector2(0, -1)
+	if (Input.is_action_pressed("breathe_down")):
+		input_direction += Vector2(0, 1)
+	if (Input.is_action_pressed("breathe_left")):
+		input_direction += Vector2(-1, 0)
+	if (Input.is_action_pressed("breathe_right")):
 		input_direction += Vector2(1, 0)
 	
 	if (input_direction != Vector2()):
@@ -110,8 +146,6 @@ func _get_sprite_key_frame(quantized_angle):
 	var frame = inc_to_frame_map[quantized_angle]
 	return frame
 	
-	
-
 func _ready():
 	set_fixed_process(true)
 	set_process_input(true)
@@ -121,6 +155,9 @@ func _set_sprite_frame(n):
 
 func _get_sprite():
 	return get_node("sprite")
+	
+func _get_breath():
+	return get_node("breath")
 	
 func _set_direction_label():
 	var angle = dir.angle()
