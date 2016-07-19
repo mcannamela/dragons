@@ -104,7 +104,7 @@ func _bind_move_directionalizer():
 	d.set_fixed_process(false)
 		
 func _is_breathing():
-	return breath_direction != Vector2()
+	return _get_breath_directionalizer().has_direction()
 		
 func _get_new_speed(delta):
 	var new_speed

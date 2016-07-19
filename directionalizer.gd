@@ -45,11 +45,12 @@ func update_input_direction():
 	_set_direction_label()
 	_set_quantized_direction_label(get_quantized_angle())
 	get_node('arrow').set_rot(input_direction.angle())
+
+func has_direction():
+	return input_direction != Vector2()
 	
 func get_quantized_angle():
 	return compute_quantized_angle(input_direction.angle())
-	
-
 	
 func _compute_input_direction():
 	var input_direction = Vector2()
