@@ -112,12 +112,12 @@ func _get_new_speed(delta):
 	return new_speed
 
 func _get_input_direction():
-	d = _get_move_directionalizer()
+	var d = _get_move_directionalizer()
 	d.update_direction_from_input()
 	return d.get_direction()
 
 func _get_breath_input_direction():
-	d = _get_breath_directionalizer()
+	var d = _get_breath_directionalizer()
 	d.update_direction_from_input()
 	return d.get_direction()
 
