@@ -18,6 +18,12 @@ var flap_period = .08
 var flap_accumulator = 0.0
 var quantized_direction = 0
 
+func _ready():
+	set_fixed_process(true)
+	set_process_input(true)
+	_bind_breath_directionalizer()
+	_bind_move_directionalizer()
+
 func _fixed_process(delta):
 	_update_direction_and_speed(delta)
 	_update_flap_phase(delta)
@@ -29,14 +35,11 @@ func _fixed_process(delta):
 func _update_direction_and_speed(delta):
 	dir = _get_input_direction()
 	speed = _get_new_speed(delta)
-	if (speed.length() > IDLE_SPEED*0.1):
-		# angle from (0, 1), which is , clockwise positive, between -pi and pi
-		var angle = speed.angle()
-		quantized_direction = _get_quantized_angle(angle)
+	_update_quantized_direction_if_necessary()
 	_set_direction_label()
 	_set_speed_label()
 	_set_quantized_direction_label(quantized_direction)
-	
+
 func _update_flap_phase(delta):
 	flap_accumulator += delta
 	if flap_accumulator > flap_period:
@@ -72,6 +75,33 @@ func _update_breath():
 		b.set_rot(d.angle())
 	else:
 		b.set_emitting(false)
+
+func _update_quantized_direction_if_necessary():
+	if (speed.length() > IDLE_SPEED*0.1):
+		var angle = speed.angle()
+		quantized_direction = _get_quantized_angle(angle)
+
+func _bind_breath_directionalizer():
+	var d = _get_breath_directionalizer()
+	d.up_command = 'breathe_up'
+	d.down_command = 'breathe_down'
+	d.left_command = 'breathe_left'
+	d.right_command = 'breathe_right'
+
+	d.set_process_input(false)
+	d.set_process(false)
+	d.set_fixed_process(false)
+
+func _bind_move_directionalizer():
+	var d = _get_move_directionalizer()
+	d.up_command = 'move_up'
+	d.down_command = 'move_down'
+	d.left_command = 'move_left'
+	d.right_command = 'move_right'
+
+	d.set_process_input(false)
+	d.set_process(false)
+	d.set_fixed_process(false)
 		
 func _is_breathing():
 	return breath_direction != Vector2()
@@ -82,37 +112,17 @@ func _get_new_speed(delta):
 	return new_speed
 
 func _get_input_direction():
-	var input_direction = Vector2()
-	if (Input.is_action_pressed("move_up")):
-		input_direction += Vector2(0, -1)
-	if (Input.is_action_pressed("move_down")):
-		input_direction += Vector2(0, 1)
-	if (Input.is_action_pressed("move_left")):
-		input_direction += Vector2(-1, 0)
-	if (Input.is_action_pressed("move_right")):
-		input_direction += Vector2(1, 0)
-	
-	if (input_direction != Vector2()):
-		input_direction = input_direction.normalized()
-	return input_direction
-	
+	d = _get_move_directionalizer()
+	d.update_input_direction()
+	return d.input_direction
+
 func _get_breath_input_direction():
-	var input_direction = Vector2()
-	if (Input.is_action_pressed("breathe_up")):
-		input_direction += Vector2(0, -1)
-	if (Input.is_action_pressed("breathe_down")):
-		input_direction += Vector2(0, 1)
-	if (Input.is_action_pressed("breathe_left")):
-		input_direction += Vector2(-1, 0)
-	if (Input.is_action_pressed("breathe_right")):
-		input_direction += Vector2(1, 0)
-	
-	if (input_direction != Vector2()):
-		input_direction = input_direction.normalized()
-	return input_direction
+	d = _get_breath_directionalizer()
+	d.update_input_direction()
+	return d.input_direction
 
 func _get_quantized_angle(angle):
-	return get_node("breath_directionalizer").compute_quantized_angle(angle)
+	return _get_breath_directionalizer().compute_quantized_angle(angle)
 			
 func _get_sprite_key_frame(quantized_angle):
 	var inc_to_frame_map = {
@@ -129,15 +139,6 @@ func _get_sprite_key_frame(quantized_angle):
 	var frame = inc_to_frame_map[quantized_angle]
 	return frame
 	
-func _ready():
-	set_fixed_process(true)
-	set_process_input(true)
-	var bd = get_node("breath_directionalizer")
-	bd.up_command = 'breathe_up'
-	bd.down_command = 'breathe_down'
-	bd.left_command = 'breathe_left'
-	bd.right_command = 'breathe_right'
-
 func _set_sprite_frame(n):
 	_get_sprite().set_frame(n)
 
@@ -146,6 +147,12 @@ func _get_sprite():
 	
 func _get_breath():
 	return get_node("breath")
+
+func _get_breath_directionalizer():
+	return get_node("breath_directionalizer")
+
+func _get_move_directionalizer():
+	return get_node("move_directionalizer")
 	
 func _set_direction_label():
 	var angle = dir.angle()
