@@ -1,5 +1,5 @@
 
-extends Polygon2D
+extends Node2D
 
 var input_direction = Vector2()
 
@@ -9,9 +9,9 @@ var left_command = 'move_left'
 var right_command = 'move_right'
 
 const up = Vector2(0, -1)
-const down = Vector2(0, -1)
-const left = Vector2(0, -1)
-const right = Vector2(0, -1)
+const down = Vector2(0, 1)
+const left = Vector2(-1, 0)
+const right = Vector2(1, 0)
  
 func _process(delta):
 	update_input_direction()
@@ -20,7 +20,7 @@ func update_input_direction():
 	input_direction = _compute_input_direction()
 	_set_direction_label()
 	_set_quantized_direction_label(get_quantized_angle())
-	set_rot(input_direction.angle())
+	get_node('arrow').set_rot(input_direction.angle())
 	
 func get_quantized_angle():
 	return compute_quantized_angle(input_direction.angle())
