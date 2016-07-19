@@ -1,5 +1,4 @@
-
-extends Node2D
+extends "res://base_directionalizer.gd"
 
 var input_direction = Vector2()
 
@@ -13,24 +12,6 @@ const down = Vector2(0, 1)
 const left = Vector2(-1, 0)
 const right = Vector2(1, 0)
 
-static func compute_quantized_angle(angle):
-	# angle as from atan2, between -pi and pi
-	var angle_inc = PI/4.0	
-	
-	# eliminate edge case
-	if angle < -7*PI/8 or angle > 7*PI/8:
-		return 0
-		
-	# all other cones contained in interval
-	var angle_lower_bound = -7*PI/8
-	var	angle_upper_bound = angle_lower_bound + angle_inc
-	
-	for i in range(7):
-		if angle >= angle_lower_bound and angle < angle_upper_bound:
-			return i + 1
-		else:
-			angle_lower_bound += angle_inc
-			angle_upper_bound += angle_inc
 
 func _ready():
 	set_process(true)
@@ -79,6 +60,3 @@ func _set_direction_label():
 func _set_quantized_direction_label(q):
 	var s = "%d" % [q]
 	get_node("quantized_direction").set_text(s)
-
-
-

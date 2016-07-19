@@ -113,13 +113,13 @@ func _get_new_speed(delta):
 
 func _get_input_direction():
 	d = _get_move_directionalizer()
-	d.update_input_direction()
-	return d.input_direction
+	d.update_direction_from_input()
+	return d.get_direction()
 
 func _get_breath_input_direction():
 	d = _get_breath_directionalizer()
-	d.update_input_direction()
-	return d.input_direction
+	d.update_direction_from_input()
+	return d.get_direction()
 
 func _get_quantized_angle(angle):
 	return _get_breath_directionalizer().compute_quantized_angle(angle)
