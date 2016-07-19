@@ -22,6 +22,13 @@ func _process(delta):
 func update_direction_from_input():
 	var input_direction = _compute_input_direction()
 	set_direction(input_direction)
+	
+func unbind_commands():
+	up_command = ""
+	down_command = ""
+	left_command = ""
+	right_command = ""
+	
 
 func _compute_input_direction():
 	var input_direction = Vector2()

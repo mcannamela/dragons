@@ -18,6 +18,20 @@ var flap_period = .08
 var flap_accumulator = 0.0
 var quantized_direction = 0
 
+func bind_controls(player_id):
+	if player_id == null:
+		_get_breath_directionalizer().unbind_commands()
+		_get_move_directionalizer().unbind_commands()
+		
+func hide_debug_nodes():
+	_get_breath_directionalizer().hide()
+	_get_move_directionalizer().hide()
+	
+func show_debug_nodes():
+	_get_breath_directionalizer().show()
+	_get_move_directionalizer().show()
+	
+
 func _ready():
 	set_fixed_process(true)
 	set_process_input(true)
