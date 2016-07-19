@@ -1,7 +1,5 @@
 extends "res://base_directionalizer.gd"
 
-var input_direction = Vector2()
-
 var up_command = 'move_up'
 var down_command = 'move_down'
 var left_command = 'move_left'
@@ -19,20 +17,12 @@ func _ready():
 	set_process_input(true)
  
 func _process(delta):
-	update_input_direction()
+	update_direction_from_input()
 	
-func update_input_direction():
-	input_direction = _compute_input_direction()
-	_set_direction_label()
-	_set_quantized_direction_label(get_quantized_angle())
-	get_node('arrow').set_rot(input_direction.angle())
+func update_direction_from_input():
+	var input_direction = _compute_input_direction()
+	set_direction(input_direction)
 
-func has_direction():
-	return input_direction != Vector2()
-	
-func get_quantized_angle():
-	return compute_quantized_angle(input_direction.angle())
-	
 func _compute_input_direction():
 	var input_direction = Vector2()
 	
@@ -51,12 +41,3 @@ func _compute_input_direction():
 
 func _is_pressed(command):
 	return Input.is_action_pressed(command)
-
-func _set_direction_label():
-	var angle = input_direction.angle()
-	var s = "%f" % [angle]
-	get_node("direction").set_text(s)
-	
-func _set_quantized_direction_label(q):
-	var s = "%d" % [q]
-	get_node("quantized_direction").set_text(s)
