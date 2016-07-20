@@ -12,11 +12,11 @@ func _process(delta):
 	update()
 
 	
-func _decrement(hp):
+func decrement(hp):
 	var new_val = get_value() - hp
 	set_value(hp)
 	
-func _increment(hp):
+func increment(hp):
 	var new_val = get_value() + hp
 	set_value(hp)
 	

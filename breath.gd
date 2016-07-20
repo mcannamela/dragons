@@ -18,6 +18,7 @@ func _ready():
 func _process(delta):
 	_burninate_as_necessary(delta)
 	_show_burnination_indicator_if_necessary()
+	_set_igniting_body_ids_label()
 		
 func hide_debug_nodes():
 	_get_damage_cone().hide()
@@ -92,6 +93,13 @@ func _on_damage_cone_body_exit( body ):
 	
 func _get_burnination_indicator():
 	return get_node("burnination_indicator")
+	
+func _set_igniting_body_ids_label():
+	var s = ""
+	for body in _bodies_in_damage_cone.keys():
+		s = str(s, ", ", body.get_instance_ID())
+		
+	get_node("igniting_body_ids").set_text(s)
 
 
 

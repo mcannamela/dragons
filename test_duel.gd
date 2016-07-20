@@ -6,6 +6,9 @@ func _ready():
 	get_dragon(1).bind_controls(null)
 	for d in get_dragons():
 		d.hide_debug_nodes()
+		
+	get_dragon(1).bind_on_burn_notice(get_dragon(0))
+				
 
 func get_dragon(dragon_id):
 	return get_node("dragon_%d"%(dragon_id))

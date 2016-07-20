@@ -36,7 +36,7 @@ func _ready():
 	set_process_input(true)
 	_bind_breath_directionalizer()
 	_bind_move_directionalizer()
-	_bind_on_burn_notice()
+	
 
 func _fixed_process(delta):
 	_update_direction_and_speed(delta)
@@ -45,6 +45,7 @@ func _fixed_process(delta):
 	_move_and_slide_if_necessary(delta)
 	_determine_and_set_sprite_frame()
 	_update_breath()
+	_clear_burn_notice_label()
 	
 func _update_direction_and_speed(delta):
 	dir = _get_input_direction()
@@ -117,14 +118,17 @@ func _bind_move_directionalizer():
 	d.set_process(false)
 	d.set_fixed_process(false)
 	
-func _bind_on_burn_notice():
-	_get_breath().connect("burn_notice", self, "_on_burn_notice")
+func bind_on_burn_notice(dragon):
+	dragon._get_breath().connect("burn_notice", self, "_on_burn_notice")
 	
 func _on_burn_notice(damage, body_id):
 	var hitbox_id = _get_hitbox().get_instance_ID()
 	var dragon_id = self.get_instance_ID()
 	if body_id == dragon_id:
 		_get_hp_bar().decrement(damage)
+		_set_burn_notice_label(body_id)
+	else:
+		_set_burn_notice_miss_label(body_id)
 		
 func _is_breathing():
 	return _get_breath_directionalizer().has_direction()
@@ -196,4 +200,13 @@ func _set_speed_label():
 func _set_quantized_direction_label(q):
 	var s = "%d" % [q]
 	get_node("quantized_direction_label").set_text(s)
+	
+func _set_burn_notice_miss_label(body_id):
+	get_node("burn_notice_label").set_text("MISS %d"%body_id)
+	
+func _set_burn_notice_label(body_id):
+	get_node("burn_notice_label").set_text("BURN %d"%body_id)
+	
+func _clear_burn_notice_label():
+	get_node("burn_notice_label").set_text("")
 	
