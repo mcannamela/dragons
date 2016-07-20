@@ -36,6 +36,7 @@ func _ready():
 	set_process_input(true)
 	_bind_breath_directionalizer()
 	_bind_move_directionalizer()
+	_bind_on_burn_notice()
 
 func _fixed_process(delta):
 	_update_direction_and_speed(delta)
@@ -89,7 +90,6 @@ func _update_breath():
 	else:
 		b.set_breathing(false)
 		
-
 func _update_quantized_direction_if_necessary():
 	if (speed.length() > IDLE_SPEED*0.1):
 		var angle = speed.angle()
@@ -116,6 +116,15 @@ func _bind_move_directionalizer():
 	d.set_process_input(false)
 	d.set_process(false)
 	d.set_fixed_process(false)
+	
+func _bind_on_burn_notice():
+	_get_breath().connect("burn_notice", self, "_on_burn_notice")
+	
+func _on_burn_notice(damage, body_id):
+	var hitbox_id = _get_hitbox().get_instance_ID()
+	var dragon_id = self.get_instance_ID()
+	if body_id == dragon_id:
+		_get_hp_bar().decrement(damage)
 		
 func _is_breathing():
 	return _get_breath_directionalizer().has_direction()
@@ -167,6 +176,12 @@ func _get_breath_directionalizer():
 
 func _get_move_directionalizer():
 	return get_node("move_directionalizer")
+	
+func _get_hitbox():
+	return get_node("hitbox")
+	
+func _get_hp_bar():
+	return get_node("hp_bar")
 	
 func _set_direction_label():
 	var angle = dir.angle()
