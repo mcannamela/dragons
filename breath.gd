@@ -7,7 +7,7 @@ var _breathing = false
 
 var _bodies_in_damage_cone = {}
 var _burn_time_remaining_by_body = {}
-var _damage_per_second = 1.0
+var _damage_per_second = 10.0
 var _hide_debug_bodies = false
 
 signal burn_notice(damage, burning_body_id)

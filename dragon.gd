@@ -6,7 +6,7 @@ const MAX_SPEED = 300.0
 const IDLE_SPEED = 10.0
 const ACCEL = 5.0
 const VSCALE = 0.5
-const SHOOT_INTERVAL = 0.3
+const HP_REGEN_PER_SECOND = 2.0
 
 var speed = Vector2()
 var dir = Vector2()
@@ -36,9 +36,9 @@ func _ready():
 	set_process_input(true)
 	_bind_breath_directionalizer()
 	_bind_move_directionalizer()
-	
 
 func _fixed_process(delta):
+	_regen_hp(delta)
 	_update_direction_and_speed(delta)
 	_update_flap_phase(delta)
 	_update_breath_direction()
@@ -46,6 +46,9 @@ func _fixed_process(delta):
 	_determine_and_set_sprite_frame()
 	_update_breath()
 	_clear_burn_notice_label()
+
+func _regen_hp(delta):
+	_get_hp_bar().increment(delta*HP_REGEN_PER_SECOND)
 	
 func _update_direction_and_speed(delta):
 	dir = _get_input_direction()
