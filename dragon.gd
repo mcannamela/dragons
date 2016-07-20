@@ -18,10 +18,17 @@ var flap_period = .08
 var flap_accumulator = 0.0
 var quantized_direction = 0
 
+
+func modulate_color(color):
+	_get_sprite().set_modulate(color)
+	
 func bind_controls(player_id):
 	if player_id == null:
 		_get_breath_directionalizer().unbind_commands()
 		_get_move_directionalizer().unbind_commands()
+		
+func bind_on_burn_notice(dragon):
+	dragon._get_breath().connect("burn_notice", self, "_on_burn_notice")
 		
 func hide_debug_nodes():
 	_get_breath_directionalizer().hide()
@@ -120,9 +127,6 @@ func _bind_move_directionalizer():
 	d.set_process_input(false)
 	d.set_process(false)
 	d.set_fixed_process(false)
-	
-func bind_on_burn_notice(dragon):
-	dragon._get_breath().connect("burn_notice", self, "_on_burn_notice")
 	
 func _on_burn_notice(damage, body_id):
 	var hitbox_id = _get_hitbox().get_instance_ID()

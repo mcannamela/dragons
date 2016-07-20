@@ -8,6 +8,8 @@ func _ready():
 		d.hide_debug_nodes()
 		
 	get_dragon(1).bind_on_burn_notice(get_dragon(0))
+	
+	get_dragon(1).modulate_color(Color(0, 1, 1))
 				
 
 func get_dragon(dragon_id):
