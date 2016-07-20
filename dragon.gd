@@ -31,7 +31,6 @@ func show_debug_nodes():
 	_get_breath_directionalizer().show()
 	_get_move_directionalizer().show()
 	
-
 func _ready():
 	set_fixed_process(true)
 	set_process_input(true)
@@ -84,11 +83,12 @@ func _update_breath():
 	var b = _get_breath()
 	var d = breath_direction
 	if _is_breathing():
-		b.set_emitting(true)
+		b.set_breathing(true)
 		b.set_pos(32*d)
 		b.set_rot(d.angle())
 	else:
-		b.set_emitting(false)
+		b.set_breathing(false)
+		
 
 func _update_quantized_direction_if_necessary():
 	if (speed.length() > IDLE_SPEED*0.1):

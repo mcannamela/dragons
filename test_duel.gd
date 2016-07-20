@@ -16,4 +16,3 @@ func get_dragons():
 		dragons.append(get_dragon(i))
 	return dragons
 		
-
